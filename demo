@@ -27,8 +27,9 @@ GetOptions("verbose"=> \$verbose,
 
 use lib ".";
 use Demo;
-
+use FP::Repl::AutoTrap;
 use FP::Repl;
+use Chj::ruse;
 
 repl;
 
