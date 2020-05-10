@@ -6,7 +6,7 @@ package Demo;
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-use FP::List qw(cons null);
+use FP::List qw(cons null list);
 use FP::Lazy 'lazy';
 use FP::Stream; # to load the lazy sequence operators so that
 		# e.g. `mystream(5,6,7)->map(sub{$_[0]*2})` calculates
@@ -24,6 +24,17 @@ sub mystream_iterate {
 sub mystream {
     mystream_iterate [@_], 0
 }
+
+use Chj::TEST;
+
+TEST {
+    mystream(5,6,7)->map(sub{$_[0]*2})->list
+} list(10, 12, 14);
+
+TEST {
+    ref( mystream(5,6,7)->map(sub{$_[0]*2}) )
+} 'FP::Lazy::Promise';
+
 
 use FP::Repl;
 
