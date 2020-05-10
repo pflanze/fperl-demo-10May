@@ -8,23 +8,21 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
 
 use FP::List qw(cons null);
 use FP::Lazy 'lazy';
-use FP::Stream; # imports `Weakened`, and also to load the lazy sequence
-                # operators so that
-                # e.g. `mystream(5,6,7)->map(sub{$_[0]*2})` calculates
-                # its result lazily, too.
+use FP::Stream; # to load the lazy sequence operators so that
+		# e.g. `mystream(5,6,7)->map(sub{$_[0]*2})` calculates
+		# its result lazily, too.
+
+sub mystream_iterate {
+    my ($elements, $i)= @_;
+    lazy {
+	$i <= $#$elements
+	  ? cons( $$elements[$i], mystream_iterate($elements, $i+1) )
+	  : null # (null is the end of list marker, same as `list()`)
+    }
+}
 
 sub mystream {
-    my @elements= @_;
-    my $next; $next= sub {
-	my ($i)= @_;
-	my $next= $next; # I'd love for this not to be necessary
-	lazy {
-	    $i <= $#elements
-	      ? cons( $elements[$i], &$next($i+1) )
-	      : null # (null is the end of list marker, same as `list()`)
-	}
-    };
-    Weakened($next)->(0)  # I'd love for the `Weakened` not to be necessary
+    mystream_iterate [@_], 0
 }
 
 use FP::Repl;
