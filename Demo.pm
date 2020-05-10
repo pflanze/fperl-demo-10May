@@ -18,9 +18,10 @@ sub mystream {
     my @elements= @_;
     sub {
 	my ($i)= @_;
+	my $__SUB__= __SUB__; # I'd love for this not to be necessary
 	lazy {
 	    $i <= $#elements
-	      ? cons( $elements[$i], __SUB__->($i+1) )
+	      ? cons( $elements[$i], $__SUB__->($i+1) )
 	      : null # (null is the end of list marker, same as `list()`)
 	}
     }->(0)
