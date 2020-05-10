@@ -12,19 +12,18 @@ use FP::Stream; # imports `Weakened`, and also to load the lazy sequence
                 # operators so that
                 # e.g. `mystream(5,6,7)->map(sub{$_[0]*2})` calculates
                 # its result lazily, too.
+use v5.16; # __SUB__
 
 sub mystream {
     my @elements= @_;
-    my $next; $next= sub {
+    sub {
 	my ($i)= @_;
-	my $next= $next; # I'd love for this not to be necessary
 	lazy {
 	    $i <= $#elements
-	      ? cons( $elements[$i], &$next($i+1) )
+	      ? cons( $elements[$i], __SUB__->($i+1) )
 	      : null # (null is the end of list marker, same as `list()`)
 	}
-    };
-    Weakened($next)->(0)  # I'd love for the `Weakened` not to be necessary
+    }->(0)
 }
 
 use Chj::TEST;
